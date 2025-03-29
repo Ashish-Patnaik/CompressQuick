@@ -50,7 +50,8 @@ function App() {
 
     try {
       // Replace with your actual backend endpoint if different
-      const response = await fetch('${process.env.REACT_APP_BACKEND_URL}/compress', {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      const response = await fetch('${backendUrl}/compress', {
         method: 'POST',
         body: formData,
       });
