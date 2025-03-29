@@ -50,7 +50,7 @@ function App() {
 
     try {
       // Replace with your actual backend endpoint if different
-      const response = await fetch('https://compressor-ryx4.onrender.com/compress', {
+      const response = await fetch('${process.env.REACT_APP_BACKEND_URL}/compress', {
         method: 'POST',
         body: formData,
       });
