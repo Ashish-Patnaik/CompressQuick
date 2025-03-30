@@ -13,32 +13,36 @@ function App() {
   const [originalFileName, setOriginalFileName] = useState(''); // Store original filename
 
   // Close mobile menu if window resizes to desktop view
+  // REMOVED: Body class manipulation logic
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768 && isMobileMenuOpen) { // Only close if open
         setIsMobileMenuOpen(false);
-         document.body.classList.remove('mobile-menu-active'); // Ensure body scroll is re-enabled
+        // document.body.classList.remove('mobile-menu-active'); // REMOVED
       }
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isMobileMenuOpen]); // Add dependency
+  }, [isMobileMenuOpen]); // Keep dependency
 
-  // Toggle mobile menu and body class for scroll lock
+  // Toggle mobile menu
+  // REMOVED: Body class manipulation logic
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-    if (!isMobileMenuOpen) {
-      document.body.classList.add('mobile-menu-active');
-    } else {
-      document.body.classList.remove('mobile-menu-active');
-    }
+    // REMOVED BODY CLASS LOGIC
+    // if (!isMobileMenuOpen) {
+    //   document.body.classList.add('mobile-menu-active');
+    // } else {
+    //   document.body.classList.remove('mobile-menu-active');
+    // }
   };
 
   // Close mobile menu when a link is clicked
+  // REMOVED: Body class manipulation logic
   const handleNavLinkClick = () => {
     if (isMobileMenuOpen) {
       setIsMobileMenuOpen(false);
-      document.body.classList.remove('mobile-menu-active'); // Remove class on link click
+      // document.body.classList.remove('mobile-menu-active'); // REMOVED
     }
   }
 
@@ -68,8 +72,12 @@ function App() {
     setCompressedImage(null); // Clear previous compressed image
     setCompressedSize(0);
     setLoading(true);
-    setIsMobileMenuOpen(false); // Close menu on action
-    document.body.classList.remove('mobile-menu-active'); // Ensure scroll unlocked on action
+    // Close menu on action
+    // REMOVED: Body class manipulation logic
+    if (isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+        // document.body.classList.remove('mobile-menu-active'); // REMOVED
+    }
 
     const formData = new FormData();
     formData.append('image', file);
@@ -272,18 +280,19 @@ function App() {
           </a>
 
           {/* Mobile Menu Button */}
+          {/* Keep position: relative for z-index */}
           <div className="mobile-menu-button" onClick={toggleMobileMenu} style={{
             cursor: 'pointer', display: 'none',
-            fontSize: '1.8rem', zIndex: 1100, // Ensure button is above overlay
+            fontSize: '1.8rem', zIndex: 1100,
             color: 'rgba(255, 255, 255, 0.9)',
-            position: 'relative', // Needed for z-index
+            position: 'relative', // Keep this for z-index stacking
           }}>
             {isMobileMenuOpen ? <AiOutlineClose /> : <GiHamburgerMenu />}
           </div>
 
           {/* Navigation Links */}
+          {/* Removed inline display style, handled by CSS */}
           <div className={`nav-links ${isMobileMenuOpen ? 'open' : ''}`} style={{
-             // Base styles removed, controlled by CSS below
              gap: 'clamp(15px, 4vw, 25px)', // Keep gap for desktop
           }}>
             {/* Links */}
@@ -319,6 +328,7 @@ function App() {
           }}></div>
 
           {/* === Embedded Styles === */}
+          {/* // --- UPDATED/REVERTED CSS FOR MOBILE NAVBAR --- */}
           <style>{`
             /* General Animations */
             @keyframes gradientBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
@@ -356,12 +366,12 @@ function App() {
               box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             }
 
-            /* Body class for scroll lock */
-             body.mobile-menu-active {
+            /* REMOVED: Body class for scroll lock */
+             /* body.mobile-menu-active {
                overflow: hidden;
-             }
+             } */
 
-            /* --- DESKTOP Navbar Styles --- */
+            /* --- DESKTOP Navbar Styles (Unchanged) --- */
              .nav-links {
                 display: flex; /* Default for desktop */
                 align-items: center;
@@ -371,44 +381,49 @@ function App() {
              }
 
 
-            /* --- MOBILE Navbar Styles --- */
+            /* --- REVERTED MOBILE Navbar Styles (Like First Code Block) --- */
             @media (max-width: 768px) {
               .nav-links {
-                position: fixed; /* Cover viewport */
-                top: 0;
+                /* Reverted positioning */
+                position: absolute;
+                top: 0; /* Align to top */
                 left: 0;
                 width: 100%;
-                height: 100%; /* Full height */
-                background: rgba(15, 12, 41, 0.95);
+                height: 100vh; /* Full height overlay */
+                background: rgba(15, 12, 41, 0.95); /* Darker, more opaque background */
                 backdrop-filter: blur(10px);
-                flex-direction: column; /* Stack links vertically */
+                flex-direction: column;
                 align-items: center;
-                justify-content: center;
-                padding: 60px 20px 20px; /* Padding around links */
-                gap: 30px; /* Space between links */
+                justify-content: center; /* Center links vertically */
+                padding: 60px 20px 20px; /* Add padding top for close button */
+                gap: 30px; /* Increase gap for vertical layout */
+                /* Reverted display logic */
+                display: none; /* Hidden by default */
                 transform: translateX(100%); /* Start off-screen */
-                transition: transform 0.3s ease-in-out;
-                z-index: 1050; /* Below menu button */
-                overflow-y: auto; /* Allow scroll if needed */
-                display: flex; /* Always flex, visibility controlled by transform */
+                transition: transform 0.3s ease-in-out, display 0.3s ease-in-out; /* Keep transition */
+                z-index: 1050; /* Below the close button */
               }
 
               .nav-links.open {
+                /* Reverted display logic */
+                display: flex; /* Show when open */
                 transform: translateX(0); /* Slide in */
               }
 
-              .nav-links a { /* Mobile link styles */
+              .nav-links a { /* Style mobile links */
                  font-size: 1.4rem;
                  color: rgba(255, 255, 255, 0.9);
               }
-              .nav-links a .nav-link-underline {
-                 height: 3px; /* Thicker underline */
+              .nav-links a .nav-link-underline { /* Make underline thicker on mobile */
+                 height: 3px;
               }
 
               .mobile-menu-button {
-                display: block !important; /* Show mobile button */
+                display: block !important; /* Force display */
+                 /* z-index handled by inline style + position relative */
               }
 
+              /* --- Other mobile styles (kept from second block for consistency elsewhere) --- */
               main { /* Adjust main padding */
                  padding: clamp(30px, 8vh, 60px) clamp(16px, 5vw, 24px) clamp(50px, 10vh, 80px);
               }
@@ -644,7 +659,6 @@ function App() {
         )}
 
         {/* === How It Works Section (Only show if no images are loaded) === */}
-        {/* Corrected syntax: removed extra ')' after the closing '}' */}
         {!originalImage && !loading && (
            <section id="how-it-works" style={{
                 width: '100%', maxWidth: '1000px',
@@ -680,7 +694,7 @@ function App() {
                ))}
              </div>
            </section>
-         )} {/* <-- Only the closing curly brace */}
+         )}
 
         {/* === Footer === */}
         <footer style={{
