@@ -85,7 +85,7 @@ function App() {
     // --- CORRECTED URL CONSTRUCTION ---
     const backendUrl = import.meta.env.VITE_BACKEND_URL; // Access VITE_ variable
 
-    console.log("VITE_BACKEND_URL:", backendUrl); // Check if the variable is loaded
+     // Check if the variable is loaded
 
     if (!backendUrl) {
       console.error("ERROR: VITE_BACKEND_URL is not defined. Make sure it's set in Vercel Environment Variables and prefixed with VITE_.");
