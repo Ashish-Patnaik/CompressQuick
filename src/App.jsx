@@ -725,9 +725,9 @@ function App() {
              </div>
              {/* Footer Links */}
              <div className="footer-links" style={{ display: 'flex', gap: '25px', flexWrap: 'wrap', justifyContent: 'center' }}>
-               <a href="#" style={{ color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.3s' }}>Privacy</a>
-               <a href="#" style={{ color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.3s' }}>Terms</a>
-               <a href="#" style={{ color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.3s' }}>Contact</a>
+               <a href="https://pure-pixel-pi.vercel.app/" style={{ color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.3s' }}>PurePixel</a>
+               <a href="https://peek-text.vercel.app/" style={{ color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.3s' }}>PeekText</a>
+               <a href="https://github.com/Ashish-Patnaik" style={{ color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.3s' }}>Contact</a>
              </div>
             {/* Copyright */}
             <p style={{ color: 'rgba(255, 255, 255, 0.5)', margin: 0, fontSize: '0.85rem', textAlign: 'center', width: '100%', order: 3 }}>
