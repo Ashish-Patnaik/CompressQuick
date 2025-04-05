@@ -28,6 +28,16 @@
 
 Tired of large image files slowing down your website or taking up valuable storage space? **CompressQuick** is a user-friendly web application designed to **compress your images significantly without sacrificing visual quality**. Whether you're a web developer, a blogger, or simply someone who deals with a lot of images, CompressQuick helps you optimize your visuals for better performance and efficiency.
 
+<p align="center">
+  <a href="https://compress-quick.vercel.app/">
+    <img src="https://github.com/user-attachments/assets/97374c61-8fa7-475b-b721-ccc451df6dc9" alt="CompressQuick Logo" width="250">
+  </a>
+</p>
+
+## 🌐 Try Now
+
+[CompressQuick](https://compress-quick.vercel.app/)
+
 ## ✨ Key Features
 
 * **Lossless Compression:** Reduce image file sizes without noticeable loss in quality.
@@ -89,3 +99,5 @@ This project does not have a license. All rights are reserved by the author.
 <p align="center">
   Thank you for using CompressQuick! ✨
 </p>
+
+
