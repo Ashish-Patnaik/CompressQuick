@@ -4,9 +4,8 @@ import { GiHamburgerMenu } from 'react-icons/gi'; // Hamburger icon
 import { AiOutlineClose } from 'react-icons/ai';  // Close icon
 import ReactGA from 'react-ga4'; // Import Google Analytics
 
-// Initialize Google Analytics with your measurement ID
-// Replace 'G-XXXXXXXXXX' with your actual GA measurement ID
-ReactGA.initialize('G-XXXXXXXXXX');
+
+ReactGA.initialize('G-Z2CHRLWT02');
 
 function App() {
   const [originalImage, setOriginalImage] = useState(null); // Will hold blob URL
