@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './App.css'; // Assuming you might have some base styles here
 import { GiHamburgerMenu } from 'react-icons/gi'; // Hamburger icon
 import { AiOutlineClose } from 'react-icons/ai';  // Close icon
+import ReactGA from 'react-ga4'; // Import Google Analytics
+
+// Initialize Google Analytics with your measurement ID
+// Replace 'G-XXXXXXXXXX' with your actual GA measurement ID
+ReactGA.initialize('G-XXXXXXXXXX');
 
 function App() {
   const [originalImage, setOriginalImage] = useState(null); // Will hold blob URL
@@ -12,13 +17,16 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [originalFileName, setOriginalFileName] = useState(''); // Store original filename
 
+  // Send pageview on initial load
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+  }, []);
+
   // Close mobile menu if window resizes to desktop view
-  // REMOVED: Body class manipulation logic
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768 && isMobileMenuOpen) { // Only close if open
         setIsMobileMenuOpen(false);
-        // document.body.classList.remove('mobile-menu-active'); // REMOVED
       }
     };
     window.addEventListener('resize', handleResize);
@@ -26,23 +34,27 @@ function App() {
   }, [isMobileMenuOpen]); // Keep dependency
 
   // Toggle mobile menu
-  // REMOVED: Body class manipulation logic
   const toggleMobileMenu = () => {
+    // Track mobile menu interaction
+    ReactGA.event({
+      category: 'Navigation',
+      action: isMobileMenuOpen ? 'Close Mobile Menu' : 'Open Mobile Menu'
+    });
+    
     setIsMobileMenuOpen(!isMobileMenuOpen);
-    // REMOVED BODY CLASS LOGIC
-    // if (!isMobileMenuOpen) {
-    //   document.body.classList.add('mobile-menu-active');
-    // } else {
-    //   document.body.classList.remove('mobile-menu-active');
-    // }
   };
 
   // Close mobile menu when a link is clicked
-  // REMOVED: Body class manipulation logic
-  const handleNavLinkClick = () => {
+  const handleNavLinkClick = (linkName) => {
+    // Track navigation link clicks
+    ReactGA.event({
+      category: 'Navigation',
+      action: 'Click',
+      label: linkName
+    });
+    
     if (isMobileMenuOpen) {
       setIsMobileMenuOpen(false);
-      // document.body.classList.remove('mobile-menu-active'); // REMOVED
     }
   }
 
@@ -51,18 +63,26 @@ function App() {
     const file = e.target.files[0];
     if (!file) return;
 
-     // Basic type check client-side (optional but good UX)
-     const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-     if (!acceptedTypes.includes(file.type)) {
-         alert(`Unsupported file type: ${file.type}. Please upload JPG, PNG, GIF, or WebP.`);
-         return;
-     }
+    // Basic type check client-side (optional but good UX)
+    const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!acceptedTypes.includes(file.type)) {
+      alert(`Unsupported file type: ${file.type}. Please upload JPG, PNG, GIF, or WebP.`);
+      return;
+    }
 
-     // Size check client-side (optional) - align with server limit (10MB)
-     if (file.size > 10 * 1024 * 1024) {
-         alert('File is too large. Maximum size is 10MB.');
-         return;
-     }
+    // Size check client-side (optional) - align with server limit (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File is too large. Maximum size is 10MB.');
+      return;
+    }
+
+    // Track image upload event with file type and size
+    ReactGA.event({
+      category: 'Image',
+      action: 'Upload',
+      label: file.type,
+      value: Math.round(file.size / 1024) // size in KB as value
+    });
 
     // Create Object URL immediately for display
     const objectUrl = URL.createObjectURL(file);
@@ -72,11 +92,10 @@ function App() {
     setCompressedImage(null); // Clear previous compressed image
     setCompressedSize(0);
     setLoading(true);
+    
     // Close menu on action
-    // REMOVED: Body class manipulation logic
     if (isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
-        // document.body.classList.remove('mobile-menu-active'); // REMOVED
     }
 
     const formData = new FormData();
@@ -85,8 +104,7 @@ function App() {
     // --- CORRECTED URL CONSTRUCTION ---
     const backendUrl = import.meta.env.VITE_BACKEND_URL; // Access VITE_ variable
 
-     // Check if the variable is loaded
-
+    // Check if the variable is loaded
     if (!backendUrl) {
       console.error("ERROR: VITE_BACKEND_URL is not defined. Make sure it's set in Vercel Environment Variables and prefixed with VITE_.");
       alert("Configuration error: Cannot connect to the backend service.");
@@ -128,6 +146,14 @@ function App() {
       setCompressedImage(compressedObjectUrl);
       setCompressedSize(compressedFileSize);
 
+      // Track successful compression with compression metrics
+      ReactGA.event({
+        category: 'Image',
+        action: 'Compression Success',
+        label: file.type,
+        value: Math.round((1 - (compressedFileSize / file.size)) * 100) // compression percentage
+      });
+
       // Trigger automatic download
       const link = document.createElement('a');
       link.href = compressedObjectUrl;
@@ -142,6 +168,14 @@ function App() {
 
     } catch (err) {
       console.error('Compression failed:', err); // Log the full error
+      
+      // Track compression errors
+      ReactGA.event({
+        category: 'Error',
+        action: 'Compression Failure',
+        label: err.message
+      });
+      
       let userMessage = 'Compression failed. Please try again later.';
       if (err.message.includes('NetworkError') || err.message.includes('Failed to fetch')) {
            userMessage = 'Could not connect to the compression service. Please check your internet connection.';
@@ -163,8 +197,6 @@ function App() {
        if (compressedObjectUrl) URL.revokeObjectURL(compressedObjectUrl);
        setCompressedImage(null);
        setCompressedSize(0);
-
-
     } finally {
       setLoading(false);
     }
@@ -173,6 +205,14 @@ function App() {
   // Download Handler (uses state)
   const downloadCompressedImage = () => {
     if (!compressedImage) return; // compressedImage holds the blob URL
+    
+    // Track download click
+    ReactGA.event({
+      category: 'Image',
+      action: 'Manual Download',
+      label: originalFileName
+    });
+    
     const link = document.createElement('a');
     link.href = compressedImage;
 
@@ -212,7 +252,6 @@ function App() {
     // Dependencies: Run effect if either image URL changes
   }, [originalImage, compressedImage]);
 
-
   // --- JSX Structure ---
   return (
     <div style={{
@@ -230,7 +269,7 @@ function App() {
       }}>
         <div style={{ position: 'absolute', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(103, 58, 183, 0.4), rgba(103, 58, 183, 0))', top: '5%', right: '-100px', filter: 'blur(50px)', animation: 'float 15s ease-in-out infinite alternate' }}></div>
         <div style={{ position: 'absolute', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(233, 30, 99, 0.25), rgba(233, 30, 99, 0))', bottom: '10%', left: '-150px', filter: 'blur(60px)', animation: 'float 18s ease-in-out infinite alternate-reverse' }}></div>
-        <div style={{ position: 'absolute', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(33, 150, 243, 0.3), rgba(33, 150, 243, 0))', top: '30%', left: '10%', filter: 'blur(40px)', animation: 'float 12s ease-in-out infinite' }}></div>
+        <div style={{ position: 'absolute', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(33, 150, 243, 0.3), rgba(33, 150, 243, 0))', top: '30%', left: '10%', filter: 'blur(40px)', animation: 'float 12s ease-in-out infinite' }}></div> 
       </div>
 
       {/* Main Content Container */}
@@ -255,7 +294,17 @@ function App() {
           zIndex: 1000,
         }}>
           {/* Logo and Title */}
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
+          <a 
+            href="/" 
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}
+            onClick={() => {
+              ReactGA.event({
+                category: 'Navigation',
+                action: 'Click',
+                label: 'Logo'
+              });
+            }}
+          >
             <img
               src="/icon.ico" // Path from public folder
               alt="CompressQuick Logo"
@@ -296,15 +345,32 @@ function App() {
              gap: 'clamp(15px, 4vw, 25px)', // Keep gap for desktop
           }}>
             {/* Links */}
-            <a href="#features" className="nav-link" onClick={handleNavLinkClick} style={{ color: 'rgba(255, 255, 255, 0.85)', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s', padding: '8px 5px' }}>
+            <a 
+              href="#features" 
+              className="nav-link" 
+              onClick={() => handleNavLinkClick('Features')} 
+              style={{ color: 'rgba(255, 255, 255, 0.85)', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s', padding: '8px 5px' }}
+            >
               Features
               <span className="nav-link-underline"></span>
             </a>
-            <a href="#how-it-works" className="nav-link" onClick={handleNavLinkClick} style={{ color: 'rgba(255, 255, 255, 0.85)', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s', padding: '8px 5px' }}>
+            <a 
+              href="#how-it-works" 
+              className="nav-link" 
+              onClick={() => handleNavLinkClick('How it Works')} 
+              style={{ color: 'rgba(255, 255, 255, 0.85)', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s', padding: '8px 5px' }}
+            >
               How it Works
               <span className="nav-link-underline"></span>
             </a>
-            <a href="https://github.com/Sankalp-Srivastava-07/CompressQuick-Frontend" target="_blank" rel="noopener noreferrer" className="nav-link" onClick={handleNavLinkClick} style={{ color: 'rgba(255, 255, 255, 0.85)', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s', padding: '8px 5px' }}>
+            <a 
+              href="https://github.com/Sankalp-Srivastava-07/CompressQuick-Frontend" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="nav-link" 
+              onClick={() => handleNavLinkClick('GitHub')} 
+              style={{ color: 'rgba(255, 255, 255, 0.85)', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s', padding: '8px 5px' }}
+            >
               GitHub
               <span className="nav-link-underline"></span>
             </a>
@@ -365,11 +431,6 @@ function App() {
               transform: translateY(-6px);
               box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             }
-
-            /* REMOVED: Body class for scroll lock */
-             /* body.mobile-menu-active {
-               overflow: hidden;
-             } */
 
             /* --- DESKTOP Navbar Styles (Unchanged) --- */
              .nav-links {
@@ -553,7 +614,7 @@ function App() {
             <div className="image-card" style={{
               background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(10px)',
               borderRadius: '16px', boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
-              border: '1px solid rgba(255, 255, 255, 0.1)', padding: '20px',
+              border: '1px solid rgba(255, 255, 255, 0.1)', padding
               width: '100%', maxWidth: '420px',
               textAlign: 'center', transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               position: 'relative', overflow: 'hidden', flex: '1 1 300px'
