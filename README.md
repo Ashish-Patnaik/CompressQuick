@@ -38,6 +38,11 @@ Tired of large image files slowing down your website or taking up valuable stora
 
 [CompressQuick](https://compress-quick.vercel.app/)
 
+## ✨Demo
+
+https://github.com/user-attachments/assets/dee9ae2c-39a9-45d8-9409-d4e6fa8e1680
+
+
 ## ✨ Key Features
 
 * **Lossless Compression:** Reduce image file sizes without noticeable loss in quality.
