@@ -363,7 +363,7 @@ function App() {
               <span className="nav-link-underline"></span>
             </a>
             <a 
-              href="https://github.com/Sankalp-Srivastava-07/CompressQuick-Frontend" 
+              href="https://github.com/Ashish-Patnaik/CompressQuick" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="nav-link" 
