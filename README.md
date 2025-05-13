@@ -93,7 +93,7 @@ Here are some ideas for future development:
 
 ## 🛡️ License
 
-This project does not have a license. All rights are reserved by the author.
+This project has an Apache License.
 
 ## 👨‍💻 Author
 
